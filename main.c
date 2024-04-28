@@ -42,7 +42,7 @@ void draw();
 void keyboard(unsigned char key, int x, int y);
 
 // Funcoes do algoritimo
-int should_change(RGBpixel compare_to, RGBpixel competitor_one, RGBpixel competitor_two, int* is_good_enough);
+unsigned int should_change(RGBpixel compare_to, RGBpixel competitor_one, RGBpixel competitor_two, RGBpixel reference_2,int* is_good_enough);
 void change_pixels();
 void improve(Img* desej, Img* output, int pos);
 void switch_pixels(Img* img, int pixel1, int pixel2);
@@ -63,6 +63,25 @@ int sel;
 #define ORIGEM 0
 #define DESEJ 1
 #define SAIDA 2
+
+void swap(RGBpixel *a, RGBpixel *b)
+{
+    RGBpixel temp = *a;
+    *a = *b;
+    *b = temp;
+}
+
+// Function to shuffle an array of RGB pixels
+void shufflePixels(RGBpixel *pixels, int size)
+{
+    for (int i = size - 1; i > 0; i--)
+    {
+        // Generate a random index between 0 and i
+        int j = rand() % (i + 1);
+        // Swap pixels[i] with pixels[j]
+        swap(&pixels[i], &pixels[j]);
+    }
+}
 
 int main(int argc, char *argv[])
 {
@@ -130,6 +149,7 @@ int main(int argc, char *argv[])
     int tam = pic[ORIGEM].width * pic[ORIGEM].height;
     memcpy(pic[SAIDA].pixels, pic[ORIGEM].pixels, sizeof(RGBpixel) * tam);
 
+    shufflePixels(pic[SAIDA].pixels, tam);
     //
     // Neste ponto, voce deve implementar o algoritmo!
     // (ou chamar funcoes para fazer isso)
@@ -162,7 +182,8 @@ void improve(Img* desej, Img* output, int orig_rand_pixel){
         if(should_change(
             desej->pixels[orig_rand_pixel], 
             output->pixels[orig_rand_pixel], 
-            output->pixels[second_rand_pixel], 
+            output->pixels[second_rand_pixel],
+            desej->pixels[second_rand_pixel], 
             &is_good_enough))
         {
             switch_pixels(output, orig_rand_pixel, second_rand_pixel);
@@ -180,7 +201,7 @@ void switch_pixels(Img* image, int pixel1, int pixel2){
     image->pixels[pixel2] = orig;
 }
 // Returns 1 if should change 0 if not
-int should_change(RGBpixel compare_to, RGBpixel competitor_one, RGBpixel competitor_two, int* is_good_enough){
+unsigned int should_change(RGBpixel compare_to, RGBpixel competitor_one, RGBpixel competitor_two, RGBpixel reference_2,int* is_good_enough){
     int diference1_r = competitor_one.r - compare_to.r;
     int diference1_g = competitor_one.g - compare_to.g;
     int diference1_b = competitor_one.b - compare_to.b;
@@ -191,14 +212,25 @@ int should_change(RGBpixel compare_to, RGBpixel competitor_one, RGBpixel competi
 
     double distance1 = sqrt(pow(diference1_r, 2) + pow(diference1_g, 2) + pow(diference1_b, 2));
     double distance2 = sqrt(pow(diference2_r, 2) + pow(diference2_g, 2) + pow(diference2_b, 2));
-    if(distance1 == 0.0){
-        *is_good_enough = 1;
-    }
-    if (distance1 <= distance2){
-        return 0;
+
+    // Check second reference
+    int diferenceref1_r = competitor_one.r - reference_2.r;
+    int diferenceref1_g = competitor_one.g - reference_2.g;
+    int diferenceref1_b = competitor_one.b - reference_2.b;
+
+    int diferenceref2_r = competitor_two.r - reference_2.r;
+    int diferenceref2_g = competitor_two.g - reference_2.g;
+    int diferenceref2_b = competitor_two.b - reference_2.b;
+
+    double distance3 = sqrt(pow(diferenceref1_r, 2) + pow(diferenceref1_g, 2) + pow(diferenceref1_b, 2));
+    double distance4 = sqrt(pow(diferenceref2_r, 2) + pow(diferenceref2_g, 2) + pow(diferenceref2_b, 2));
+
+
+    if (distance1 > distance2 && distance3 < distance4){
+        return 1;
     }
     else{
-        return 1;
+        return 0;
     }
 
 }
