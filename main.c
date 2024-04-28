@@ -149,7 +149,7 @@ int main(int argc, char *argv[])
     int tam = pic[ORIGEM].width * pic[ORIGEM].height;
     memcpy(pic[SAIDA].pixels, pic[ORIGEM].pixels, sizeof(RGBpixel) * tam);
 
-    shufflePixels(pic[SAIDA].pixels, tam);
+    //shufflePixels(pic[SAIDA].pixels, tam);
     //
     // Neste ponto, voce deve implementar o algoritmo!
     // (ou chamar funcoes para fazer isso)
@@ -177,7 +177,7 @@ void improve(Img* desej, Img* output, int orig_rand_pixel){
     //int orig_rand_pixel = rand() % (desej->height * desej->width);
     int iter = 0;
     int is_good_enough = 0;
-    while(iter < 1000){
+    while(iter < 2000){
         int second_rand_pixel = rand() % (desej->height * desej->width);
         if(should_change(
             desej->pixels[orig_rand_pixel], 
