@@ -42,7 +42,7 @@ void draw();
 void keyboard(unsigned char key, int x, int y);
 
 // Funcoes do algoritimo
-unsigned int should_change(RGBpixel compare_to, RGBpixel competitor_one, RGBpixel competitor_two, RGBpixel reference_2,int* is_good_enough);
+unsigned int should_change(RGBpixel compare_to, RGBpixel competitor_one, RGBpixel competitor_two, RGBpixel reference_2);
 void change_pixels();
 void improve(Img* desej, Img* output, int pos);
 void switch_pixels(Img* img, int pixel1, int pixel2);
@@ -176,21 +176,17 @@ int main(int argc, char *argv[])
 void improve(Img* desej, Img* output, int orig_rand_pixel){
     //int orig_rand_pixel = rand() % (desej->height * desej->width);
     int iter = 0;
-    int is_good_enough = 0;
     while(iter < 2000){
         int second_rand_pixel = rand() % (desej->height * desej->width);
         if(should_change(
             desej->pixels[orig_rand_pixel], 
             output->pixels[orig_rand_pixel], 
             output->pixels[second_rand_pixel],
-            desej->pixels[second_rand_pixel], 
-            &is_good_enough))
+            desej->pixels[second_rand_pixel]))
         {
             switch_pixels(output, orig_rand_pixel, second_rand_pixel);
         }
-        if (is_good_enough){
-            break;
-        }
+
         
         iter++;
     }
@@ -201,7 +197,7 @@ void switch_pixels(Img* image, int pixel1, int pixel2){
     image->pixels[pixel2] = orig;
 }
 // Returns 1 if should change 0 if not
-unsigned int should_change(RGBpixel compare_to, RGBpixel competitor_one, RGBpixel competitor_two, RGBpixel reference_2,int* is_good_enough){
+unsigned int should_change(RGBpixel compare_to, RGBpixel competitor_one, RGBpixel competitor_two, RGBpixel reference_2){
     int diference1_r = competitor_one.r - compare_to.r;
     int diference1_g = competitor_one.g - compare_to.g;
     int diference1_b = competitor_one.b - compare_to.b;
